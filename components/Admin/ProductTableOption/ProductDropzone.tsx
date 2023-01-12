@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Text, Image, SimpleGrid, CloseButton } from "@mantine/core";
 import { Dropzone, IMAGE_MIME_TYPE, FileWithPath } from "@mantine/dropzone";
 
-type Props = {};
+type Props = {
+  img: File | null;
+  setImg: React.Dispatch<React.SetStateAction<File | null>>;
+};
 
 export default function ProductDropzone(props: Props) {
   const [files, setFiles] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (files) props.setImg(files);
+  }, [files]);
 
   const previewFile = (file: File) => {
     const imageUrl = URL.createObjectURL(file);
@@ -40,6 +47,7 @@ export default function ProductDropzone(props: Props) {
           height: "fit-content",
         }}
         accept={IMAGE_MIME_TYPE}
+        // onDrop={(files) => setFiles(files[0])}
         onDrop={(files) => setFiles(files[0])}
         multiple={false}
       >
