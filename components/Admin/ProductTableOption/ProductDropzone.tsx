@@ -10,28 +10,31 @@ type Props = {
 export default function ProductDropzone(props: Props) {
   const [files, setFiles] = useState<File | null>(null);
 
-  useEffect(() => {
-    if (files) props.setImg(files);
-  }, [files]);
 
-  const previewFile = (file: File) => {
+  const previewFile = (file: File)  => {
     const imageUrl = URL.createObjectURL(file);
     return (
-      <div className="img-prev relative w-fit h-fit">
+      <>
+     {
+       props.img && (
+        <div className="img-prev relative w-fit h-fit">
         <Image
           src={imageUrl}
           imageProps={{ onLoad: () => URL.revokeObjectURL(imageUrl) }}
           alt={file.name}
           height={100}
           width={100}
-        ></Image>
+          ></Image>
         <CloseButton
           className="absolute top-[-10px] right-[-10px]  rounded-full "
           size="xl"
           iconSize={20}
-          onClick={() => setFiles(null)}
-        ></CloseButton>
+          onClick={() => props.setImg(null)}
+          ></CloseButton>
       </div>
+      )
+    }
+    </>
     );
   };
 
@@ -48,7 +51,7 @@ export default function ProductDropzone(props: Props) {
         }}
         accept={IMAGE_MIME_TYPE}
         // onDrop={(files) => setFiles(files[0])}
-        onDrop={(files) => setFiles(files[0])}
+        onDrop={(files) => props.setImg(files[0])}
         multiple={false}
       >
         <Text align="center" size={14}>
@@ -56,7 +59,9 @@ export default function ProductDropzone(props: Props) {
         </Text>
       </Dropzone>
 
-      <div className="flex-1">{files ? previewFile(files) : <div></div>}</div>
+      <div className="flex-1">{props.img && 
+        previewFile(props.img)
+      }</div>
     </div>
   );
 }

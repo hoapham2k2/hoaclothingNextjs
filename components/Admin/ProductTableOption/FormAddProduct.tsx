@@ -3,15 +3,15 @@ import {
   Drawer,
   MultiSelect,
   NumberInput,
-  ScrollArea,
-  Select,
   TextInput,
   Textarea,
 } from "@mantine/core";
 import React, { useEffect } from "react";
 import ProductDropzone from "./ProductDropzone";
 import { Product } from "../../../utils/types";
-import axios from "axios";
+import { showNotification } from "@mantine/notifications";
+import uploadFileToCloudinary from "../../../utils/uploadFileToCloudinary";
+import uploadProduct from "../../../utils/uploadProduct";
 
 type Props = {
   open: boolean;
@@ -31,24 +31,25 @@ const FormAddProduct = (props: Props) => {
   const [img1, setImg1] = React.useState<File | null>(null);
   const [img2, setImg2] = React.useState<File | null>(null);
 
-  useEffect(() => {
-    if (img1) console.log("img1 file", img1);
-  }, [img1]);
-
-  useEffect(() => {
-    if (img2) console.log("img2 file", img2);
-  }, [img2]);
-
-  useEffect(() => {
-    if (product.categories) console.log("categories", product.categories);
-  }, [product.categories]);
-
+  // this function will send the product to the backend
   const handleOnClick = async () => {
+    // return first if there is no image
     if (!img1 || !img2) {
-      alert("Please upload 2 images");
+      await showNotification({
+        color: "red",
+        title: "Please upload 2 images",
+        message: "Please upload 2 images",
+      });
       return;
     }
-
+    await setProductToDefault();
+    await showNotification({
+      id: "uploading-product",
+      loading: true,
+      title: "Uploading product",
+      message: "We are uploading your product",
+      autoClose: false,
+    });
     await uploadFileToCloudinary(
       img1,
       (url: string) => (product.productImg1 = url)
@@ -57,63 +58,21 @@ const FormAddProduct = (props: Props) => {
       img2,
       (url: string) => (product.productImg2 = url)
     );
-
-    await console.log("product is: ", product);
-
-    await uploadProduct(product)
-      .then(() => {
-        console.log("upload product successfully");
-      })
-      .catch((err) => {
-        console.log("upload product failed");
-      });
+    await uploadProduct(product);
   };
 
-  const uploadProduct = async (formData: Product) => {
-    try {
-      await axios
-        .post(
-          "/api/products",
-          {
-            productName: formData.productName,
-            productDescription: formData.productDescription,
-            productPrice: formData.productPrice,
-            productImg1: formData.productImg1,
-            productImg2: formData.productImg2,
-            categories: formData.categories,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        )
-        .then((res) => {
-          console.log("res is: ", res);
-        });
-      console.log("post form data to server successfully");
-    } catch (error) {
-      console.log("post form data to server failed", error);
-    }
-  };
-
-  const uploadFileToCloudinary = async (
-    file: File,
-    callback: (url: string) => void
-  ) => {
-    const data = new FormData();
-    data.append("file", file);
-    data.append("upload_preset", "clothing");
-    const res = await fetch(
-      "https://api.cloudinary.com/v1_1/dxjnvnxco/image/upload",
-      {
-        method: "POST",
-        body: data,
-      }
-    );
-    const fileData = await res.json();
-    console.log("fileData url is: ", fileData);
-    callback(fileData.secure_url);
+  // this function will set the product to default
+  const setProductToDefault = async () => {
+    await setProduct({
+      productName: "",
+      productDescription: "",
+      productPrice: 0,
+      productImg1: "",
+      productImg2: "",
+      categories: [],
+    });
+    await setImg1(null);
+    await setImg2(null);
   };
 
   return (

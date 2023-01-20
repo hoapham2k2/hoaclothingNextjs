@@ -1,4 +1,4 @@
-import { Box, Button, Drawer, Grid, Select, TextInput } from "@mantine/core";
+import { Paper, Button, Grid, Select, TextInput } from "@mantine/core";
 import React from "react";
 import FormAddProduct from "./FormAddProduct";
 
@@ -7,22 +7,18 @@ type Props = {};
 const ProductTableOption = (props: Props) => {
   const [AddProductOpen, setAddProductOpen] = React.useState<boolean>(false);
   return (
-    <Box
-      sx={(theme) => ({
-        backgroundColor:
-          theme.colorScheme === "dark"
-            ? theme.colors.dark[6]
-            : theme.colors.gray[0],
-        padding: theme.spacing.xl,
-        borderRadius: theme.radius.md,
-        cursor: "pointer",
-        // "&:hover": {
-        //   backgroundColor:
-        //     theme.colorScheme === "dark"
-        //       ? theme.colors.dark[5]
-        //       : theme.colors.gray[1],
-        // },
-      })}
+    <Paper
+      p="xl"
+      // sx={(theme) => ({
+      //   backgroundColor:
+      //     theme.colorScheme === "dark"
+      //       ? theme.colors.dark[6]
+      //       : theme.colors.gray[0],
+      //   padding: theme.spacing.xl,
+      //   borderRadius: theme.radius.md,
+      //   cursor: "pointer",
+
+      // })}
     >
       <Grid gutter={50} grow>
         <Grid.Col span={3}>
@@ -58,7 +54,7 @@ const ProductTableOption = (props: Props) => {
         </Grid.Col>
       </Grid>
       <FormAddProduct open={AddProductOpen} setOpen={setAddProductOpen} />
-    </Box>
+    </Paper>
   );
 };
 
